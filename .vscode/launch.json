@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FastAPI",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--reload",
+                "--port",
+                "8000"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "sqlite+aiosqlite:///./sql_app.db",
+                "SECRET_KEY": "7cba9bf0c69706508f6de6b0ba3abcd4861eb12cc72505412cc732c25f1a7e16"
+            },
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
+}
