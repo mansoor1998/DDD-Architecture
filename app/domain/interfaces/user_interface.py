@@ -3,7 +3,6 @@ from typing import Optional
 from uuid import UUID
 
 from app.domain import User
-from app.schemas import UserCreate
 
 class IUserRepository(ABC):
     @abstractmethod
@@ -15,5 +14,13 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def create(self, user: UserCreate) -> User:
+    async def get_by_token(self, token: str) -> Optional[User]:
+        pass
+
+    @abstractmethod
+    async def create(self, user: User) -> User:
+        pass
+
+    @abstractmethod
+    async def update(self, user: User) -> User:
         pass

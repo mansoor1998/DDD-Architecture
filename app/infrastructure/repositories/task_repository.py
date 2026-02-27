@@ -7,7 +7,6 @@ from uuid import UUID
 from app.domain.interfaces import ITaskRepository
 from app.domain import Task as DomainTask
 from app.infrastructure.persistence.models import Task as ORMTask
-from app.schemas import TaskCreate, TaskUpdate
 
 class TaskRepository(ITaskRepository):
     def __init__(self, db: AsyncSession):
@@ -26,8 +25,18 @@ class TaskRepository(ITaskRepository):
             updated_at=orm_task.updated_at,
         )
 
-    async def create(self, task: TaskCreate, user_id: UUID) -> DomainTask:
-        orm_task = ORMTask(**task.model_dump(), user_id=str(user_id))
+    async def create(self, task: DomainTask) -> DomainTask:
+        orm_task = ORMTask(
+            id=str(task.id),
+            user_id=str(task.user_id),
+            title=task.title,
+            description=task.description,
+            status=task.status,
+            priority=task.priority,
+            due_date=task.due_date,
+            created_at=task.created_at,
+            updated_at=task.updated_at,
+        )
         self.db.add(orm_task)
         await self.db.commit()
         await self.db.refresh(orm_task)
@@ -42,15 +51,14 @@ class TaskRepository(ITaskRepository):
         result = await self.db.execute(select(ORMTask).filter(ORMTask.user_id == str(user_id)))
         return [self._to_domain(orm_task) for orm_task in result.scalars().all()]
 
-    async def update(self, task_id: UUID, task_update: TaskUpdate) -> Optional[DomainTask]:
-        update_data = task_update.model_dump(exclude_unset=True)
-        if not update_data:
+    async def update(self, task_id: UUID, task_update_data: dict) -> Optional[DomainTask]:
+        if not task_update_data:
             return await self.get_by_id(task_id)
 
         await self.db.execute(
             sqlalchemy_update(ORMTask)
             .where(ORMTask.id == str(task_id))
-            .values(**update_data)
+            .values(**task_update_data)
         )
         await self.db.commit()
         return await self.get_by_id(task_id)

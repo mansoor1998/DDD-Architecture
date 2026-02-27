@@ -7,7 +7,8 @@ from app.domain.models import User
 from app.domain.services import UserService, TaskService
 from app.infrastructure.persistence.database import get_db
 from app.infrastructure.repositories import UserRepository, TaskRepository
-from app.domain.interfaces import IUserRepository, ITaskRepository
+from app.domain.interfaces import IUserRepository, ITaskRepository, IEmailSender
+from app.infrastructure.email import GmailEmailSender
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login/access-token")
 
@@ -17,8 +18,14 @@ def get_user_repository(db: AsyncSession = Depends(get_db)) -> IUserRepository:
 def get_task_repository(db: AsyncSession = Depends(get_db)) -> ITaskRepository:
     return TaskRepository(db)
 
-def get_user_service(user_repo: IUserRepository = Depends(get_user_repository)) -> UserService:
-    return UserService(user_repo)
+def get_email_sender() -> IEmailSender:
+    return GmailEmailSender()
+
+def get_user_service(
+    user_repo: IUserRepository = Depends(get_user_repository),
+    email_sender: IEmailSender = Depends(get_email_sender)
+) -> UserService:
+    return UserService(user_repo, email_sender)
 
 def get_task_service(task_repo: ITaskRepository = Depends(get_task_repository)) -> TaskService:
     return TaskService(task_repo)
@@ -40,4 +47,11 @@ async def get_current_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Inactive user",
+        )
+        
     return user
