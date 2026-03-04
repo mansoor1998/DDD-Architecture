@@ -1,4 +1,4 @@
-import { Edit2 } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 
 type StatCardProps = {
   title: string
@@ -32,12 +32,21 @@ export function StatCard({
           </div>
         </label>
 
-        <button 
-          className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
-          title="Edit task"
-        >
-          <Edit2 className="size-4" />
-        </button>
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer"
+            title="Edit task"
+          >
+            <Edit2 className="size-4" />
+          </button>
+          
+          <button 
+            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+            title="Delete task"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   )
