@@ -114,7 +114,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {isEditMode && (
+          {onCancel && (
             <button
               onClick={onCancel}
               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition-all cursor-pointer"

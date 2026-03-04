@@ -7,10 +7,16 @@ type TaskListProps = {
   tasks: Task[]
   onUpdateTask?: (id: string, data: any) => void
   onDeleteTask?: (id: string) => void
+  onEditStart?: () => void
 }
 
-export function TaskList({ tasks, onUpdateTask, onDeleteTask }: TaskListProps) {
+export function TaskList({ tasks, onUpdateTask, onDeleteTask, onEditStart }: TaskListProps) {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+
+  const handleEdit = (id: string) => {
+    setEditingTaskId(id)
+    onEditStart?.()
+  }
 
   const handleSave = (id: string, data: any) => {
     onUpdateTask?.(id, data)
@@ -38,7 +44,7 @@ export function TaskList({ tasks, onUpdateTask, onDeleteTask }: TaskListProps) {
             id={task.id}
             title={task.title}
             description={task.description || ''}
-            onEdit={() => setEditingTaskId(task.id)}
+            onEdit={() => handleEdit(task.id)}
             onDelete={() => onDeleteTask?.(task.id)}
           />
         )

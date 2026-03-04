@@ -2,12 +2,13 @@ import { useState } from 'preact/hooks'
 import { Sidebar } from '@components/Sidebar'
 import { TaskForm } from '@components/TaskForm'
 import { TaskList } from '@components/TaskList'
-import { PanelLeft } from 'lucide-react'
+import { PanelLeft, Plus } from 'lucide-react'
 import type { Task } from '@models/task.model'
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState('General')
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isAddingTask, setIsAddingTask] = useState(false)
 
   // Mock initial tasks based on the model
   const [tasks, setTasks] = useState<Task[]>([
@@ -26,6 +27,20 @@ export function HomePage() {
       status: 'in-progress',
       priority: 'high',
       due_date: new Date().toISOString()
+    },
+    {
+      id: "789e8400-e29b-41d4-a716-446655440222",
+      title: "Refactor Authentication Service",
+      status: 'todo',
+      priority: 'high',
+      due_date: new Date(Date.now() + 86400000 * 2).toISOString()
+    },
+    {
+      id: "890e8400-e29b-41d4-a716-446655440333",
+      title: "Weekly Design Sync",
+      status: 'todo',
+      priority: 'low',
+      due_date: new Date(Date.now() + 86400000 * 5).toISOString()
     }
   ])
 
@@ -35,6 +50,24 @@ export function HomePage() {
 
   const handleDeleteTask = (id: string) => {
     setTasks(prev => prev.filter(t => t.id !== id))
+  }
+
+  const handleCreateTask = (data: any) => {
+    const newTask: Task = {
+      id: crypto.randomUUID(),
+      ...data,
+      status: 'todo',
+      due_date: data.due_date?.toISOString() || null
+    }
+    setTasks(prev => [...prev, newTask])
+    setIsAddingTask(false)
+  }
+
+  const handleOpenAddTask = () => {
+    setIsAddingTask(true)
+    // The editingTaskId state is internal to TaskList, 
+    // we'll need to reset it via a ref or key if we wanted full control,
+    // but the task list will notify us if it starts editing.
   }
 
   return (
@@ -61,18 +94,40 @@ export function HomePage() {
             <h1 className="text-2xl font-bold text-gray-900">{activeTab} Tasks</h1>
           </header>
 
-          <div className="max-w-6xl mx-auto w-full px-4 space-y-8 pb-12">
-            {/* New Task Input Form */}
-            <section>
-              <TaskForm onSave={(data) => console.log('Create task:', data)} />
-            </section>
-
+          <div className="max-w-6xl mx-auto w-full px-4 space-y-6 pb-12">
             {/* Tasks List Component */}
             <TaskList 
               tasks={tasks} 
               onUpdateTask={handleUpdateTask}
               onDeleteTask={handleDeleteTask}
+              onEditStart={() => setIsAddingTask(false)}
             />
+
+            {/* Add Task Button */}
+            <div className="border-t border-gray-200 w-full" />
+
+            {/* Divider */}
+            {!isAddingTask && (
+              <div className="pt-2 flex flex-col items-start gap-4">
+                <button 
+                  onClick={handleOpenAddTask}
+                  className="group inline-flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-300 transition-all cursor-pointer active:scale-95"
+                >
+                  <Plus className="size-4 text-gray-400 group-hover:text-indigo-600" />
+                  <span>Add Task</span>
+                </button>
+              </div>
+            )}
+
+            {/* New Task Input Form */}
+            {isAddingTask && (
+              <section className="pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                <TaskForm 
+                  onSave={handleCreateTask} 
+                  onCancel={() => setIsAddingTask(false)}
+                />
+              </section>
+            )}
           </div>
         </main>
       </div>
