@@ -14,3 +14,8 @@ class User(UserBase):
     created_at: datetime.datetime
     updated_at: datetime.datetime
     model_config = ConfigDict(from_attributes=True)
+
+class UserWithToken(BaseModel):
+    user: User
+    access_token: str
+    token_type: str = "bearer"

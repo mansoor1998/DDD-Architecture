@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AuthResponse } from '@models/auth.model'
+import { decodeToken } from '@utils/jwt'
 
 export interface AuthState {
   token: string | null;
   email: string | null;
+  isActive: boolean;
   isAuthenticated: boolean;
   setAuth: (response: AuthResponse) => void;
+  updateIsActive: (isActive: boolean) => void;
   clearAuth: () => void;
 }
 
@@ -15,18 +18,22 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       email: null,
+      isActive: false,
       isAuthenticated: false,
       setAuth: (response) => {
+        const decoded = decodeToken(response.access_token)
         localStorage.setItem('token', response.access_token)
         set({ 
           token: response.access_token, 
-          email: response.user?.email ?? null,
+          email: response.user?.email ?? decoded?.sub ?? null,
+          isActive: decoded?.is_active ?? false,
           isAuthenticated: true 
         })
       },
+      updateIsActive: (isActive) => set({ isActive }),
       clearAuth: () => {
         localStorage.removeItem('token')
-        set({ token: null, email: null, isAuthenticated: false })
+        set({ token: null, email: null, isActive: false, isAuthenticated: false })
       },
     }),
     {

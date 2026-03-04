@@ -8,7 +8,7 @@ class DomainError(Exception):
 
 class UserAlreadyExistsError(DomainError):
     def __init__(self, email: str):
-        super().__init__(f"User with email {email} already exists.")
+        super().__init__(f"User with the provided email already exists.")
 
 class InvalidCredentialsError(DomainError):
     def __init__(self):

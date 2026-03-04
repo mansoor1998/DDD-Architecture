@@ -11,15 +11,7 @@ export function RegisterPage() {
 
   const handleSubmit = (e: Event) => {
     e.preventDefault()
-    register(
-      { email, password },
-      {
-        onSuccess: () => {
-          console.log("succesfully registered for the user. but the user is not active");
-          // navigate('/login')
-        }
-      }
-    )
+    register({ email, password })
   }
 
   return (

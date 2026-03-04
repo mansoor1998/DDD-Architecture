@@ -4,8 +4,13 @@ import { useAuthStore } from '@store/auth.store'
 import type { RegisterPayload, LoginPayload } from '@models/auth.model'
 
 export function useRegister() {
+  const { setAuth } = useAuthStore()
+
   return useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
+    onSuccess: (data) => {
+      setAuth(data)
+    },
   })
 }
 
@@ -27,6 +32,17 @@ export function useLogin() {
     },
     onSuccess: (data) => {
       setAuth(data)
+    },
+  })
+}
+
+export function useVerifyEmail() {
+  const { updateIsActive } = useAuthStore()
+
+  return useMutation({
+    mutationFn: (token: string) => authService.verifyEmail(token),
+    onSuccess: () => {
+      updateIsActive(true)
     },
   })
 }
