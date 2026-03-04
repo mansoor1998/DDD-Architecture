@@ -67,6 +67,7 @@ export function DatePicker({ selectedDate, onChange, placeholder = 'Select date'
       days.push(
         <button
           key={d}
+          type="button"
           onClick={() => handleDateSelect(d)}
           className={`h-8 w-8 rounded-full text-xs font-medium transition-colors flex items-center justify-center
             ${isSelected ? 'bg-indigo-600 text-white' : 
@@ -108,12 +109,14 @@ export function DatePicker({ selectedDate, onChange, placeholder = 'Select date'
             </h2>
             <div className="flex gap-1">
               <button 
+                type="button"
                 onClick={handlePrevMonth}
                 className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
               >
                 <ChevronLeft className="size-4" />
               </button>
               <button 
+                type="button"
                 onClick={handleNextMonth}
                 className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
               >
@@ -136,6 +139,7 @@ export function DatePicker({ selectedDate, onChange, placeholder = 'Select date'
 
           <div className="mt-4 pt-4 border-t border-gray-100">
              <button 
+                type="button"
                 onClick={() => {
                    onChange?.(new Date())
                    setIsOpen(false)
@@ -145,6 +149,7 @@ export function DatePicker({ selectedDate, onChange, placeholder = 'Select date'
                Today
              </button>
           </div>
+
         </div>
       )}
     </div>

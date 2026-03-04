@@ -35,6 +35,12 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleSubmit = (e: Event) => {
+    e.preventDefault()
+    if (!taskName.trim()) return
+    onSave?.({ title: taskName, description, priority, due_date: date })
+  }
+
   const priorityOptions: { label: Priority; display: string; icon: any; color: string; bg: string }[] = [
     { label: 'high', display: 'High', icon: AlertCircle, color: 'text-red-600', bg: 'hover:bg-red-50' },
     { label: 'medium', display: 'Medium', icon: Flag, color: 'text-orange-500', bg: 'hover:bg-orange-50' },
@@ -44,13 +50,24 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
   const currentPriority = priorityOptions.find(opt => opt.label === priority)!
 
   return (
-    <div className={`rounded-xl border bg-white p-1.5 shadow-xs transition-all ${isEditMode ? 'border-indigo-200 ring-1 ring-indigo-50' : 'border-gray-200 focus-within:border-gray-300'}`}>
+    <form 
+      onSubmit={handleSubmit}
+      className={`rounded-xl border bg-white p-1.5 shadow-xs transition-all ${isEditMode ? 'border-indigo-200 ring-1 ring-indigo-50' : 'border-gray-200 focus-within:border-gray-300'}`}
+    >
       <div className="px-1.5 pt-1.5">
         <input
           type="text"
           placeholder="Task name"
           value={taskName}
           onInput={(e) => setTaskName(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              if (taskName.trim()) {
+                onSave?.({ title: taskName, description, priority, due_date: date })
+              }
+            }
+          }}
           className="w-full border-none p-0 text-sm font-semibold text-gray-900 placeholder-gray-400 focus:ring-0 focus:outline-none"
         />
 
@@ -59,6 +76,14 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
           placeholder="Description"
           value={description}
           onInput={(e) => setDescription(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              if (taskName.trim()) {
+                onSave?.({ title: taskName, description, priority, due_date: date })
+              }
+            }
+          }}
           className="mt-0.5 w-full border-none p-0 text-xs text-gray-600 placeholder-gray-400 focus:ring-0 focus:outline-none resize-none overflow-hidden"
         />
       </div>
@@ -96,6 +121,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
                   {priorityOptions.map((opt) => (
                     <button
                       key={opt.label}
+                      type="button"
                       onClick={() => {
                         setPriority(opt.label)
                         setIsPriorityOpen(false)
@@ -116,6 +142,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
         <div className="flex items-center gap-2">
           {onCancel && (
             <button
+              type="button"
               onClick={onCancel}
               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition-all cursor-pointer"
             >
@@ -125,7 +152,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
           )}
           
           <button
-            onClick={() => onSave?.({ title: taskName, description, priority, due_date: date })}
+            type="submit"
             className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none transition-all cursor-pointer active:scale-95 disabled:opacity-50"
             disabled={!taskName.trim()}
           >
@@ -138,6 +165,6 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
           </button>
         </div>
       </div>
-    </div>
+    </form>
   )
 }
