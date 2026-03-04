@@ -52,7 +52,7 @@ async def login_access_token(
         user = await user_service.authenticate_user(email=form_data.username, password=form_data.password)
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user.email}, expires_delta=access_token_expires
+            data={ "sub": user.email, "is_active": user.is_active }, expires_delta=access_token_expires
         )
         return {"access_token": access_token, "token_type": "bearer"}
     except (InvalidCredentialsError, InactiveUserError) as e:

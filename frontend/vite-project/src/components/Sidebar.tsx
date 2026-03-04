@@ -1,5 +1,7 @@
 import { LayoutGrid, Calendar, CalendarDays, ListTodo, LogOut } from 'lucide-react'
 import preactLogo from '@/assets/preact.svg'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@store/auth.store'
 
 type SidebarProps = {
   value: string
@@ -8,6 +10,16 @@ type SidebarProps = {
 }
 
 export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
+  const navigate = useNavigate()
+  const { clearAuth, email } = useAuthStore()
+
+  const handleLogout = () => {
+    clearAuth()
+    navigate('/login')
+  }
+
+  const userName = email ? email.split('@')[0] : 'User'
+
   const menuItems = [
     { name: 'General', icon: LayoutGrid },
     { name: 'Today', icon: Calendar },
@@ -46,7 +58,10 @@ export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
 
       <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
         <div className="p-4">
-          <button className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+          >
             <LogOut className="size-4" />
             Logout
           </button>
@@ -55,14 +70,14 @@ export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
         <div className="flex items-center gap-2 bg-white p-4 border-t border-gray-100">
           <img
             alt="User avatar"
-            src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=1160"
+            src={`https://ui-avatars.com/api/?name=${userName}&background=6366f1&color=fff`}
             className="size-10 rounded-full object-cover"
           />
 
           <div>
             <p className="text-xs">
-              <strong className="block font-medium">Eric Frusciante</strong>
-              <span className="text-gray-400"> eric@frusciante.com </span>
+              <strong className="block font-medium capitalize">{userName}</strong>
+              <span className="text-gray-400"> {email} </span>
             </p>
           </div>
         </div>
