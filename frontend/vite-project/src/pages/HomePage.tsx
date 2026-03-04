@@ -56,7 +56,6 @@ export function HomePage() {
           <header className="max-w-6xl mx-auto w-full flex justify-between items-end mb-8 px-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{activeTab} Tasks</h1>
-              <p className="text-gray-500 text-sm">Managing your {activeTab.toLowerCase()} workspace.</p>
             </div>
             <DatePicker 
               selectedDate={selectedDate} 

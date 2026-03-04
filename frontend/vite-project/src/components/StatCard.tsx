@@ -1,3 +1,5 @@
+import { Edit2 } from 'lucide-react'
+
 type StatCardProps = {
   title: string
   description: string
@@ -10,9 +12,9 @@ export function StatCard({
   id
 }: StatCardProps) {
   return (
-    <div className="block rounded-md border border-gray-300 p-3 shadow-sm sm:p-4 bg-white hover:border-indigo-500 transition-colors w-full">
-      <div className="flex flex-col items-start gap-3">
-        <label htmlFor={id} className="inline-flex items-start gap-3 w-full cursor-pointer">
+    <div className="group block rounded-md border border-gray-300 p-3 shadow-sm sm:p-4 bg-white hover:border-indigo-500 transition-colors w-full">
+      <div className="flex items-start justify-between gap-3">
+        <label htmlFor={id} className="inline-flex items-start gap-3 flex-1 cursor-pointer">
           <input 
             type="checkbox" 
             className="my-1 size-5 rounded border-gray-300 shadow-sm text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
@@ -29,6 +31,13 @@ export function StatCard({
             </p>
           </div>
         </label>
+
+        <button 
+          className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
+          title="Edit task"
+        >
+          <Edit2 className="size-4" />
+        </button>
       </div>
     </div>
   )
