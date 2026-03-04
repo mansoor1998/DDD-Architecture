@@ -4,12 +4,16 @@ type StatCardProps = {
   title: string
   description: string
   id: string
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
 export function StatCard({ 
   title, 
   description, 
-  id
+  id,
+  onEdit,
+  onDelete
 }: StatCardProps) {
   return (
     <div className="group block rounded-md border border-gray-300 p-3 shadow-sm sm:p-4 bg-white hover:border-indigo-500 transition-colors w-full">
@@ -34,6 +38,10 @@ export function StatCard({
 
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
+            onClick={(e) => {
+              e.preventDefault();
+              onEdit?.();
+            }}
             className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all cursor-pointer"
             title="Edit task"
           >
@@ -41,6 +49,10 @@ export function StatCard({
           </button>
           
           <button 
+            onClick={(e) => {
+              e.preventDefault();
+              onDelete?.();
+            }}
             className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer"
             title="Delete task"
           >

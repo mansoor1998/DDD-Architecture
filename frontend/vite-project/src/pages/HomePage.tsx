@@ -1,31 +1,41 @@
 import { useState } from 'preact/hooks'
 import { Sidebar } from '@components/Sidebar'
-import { StatCard } from '@components/StatCard'
 import { TaskForm } from '@components/TaskForm'
+import { TaskList } from '@components/TaskList'
 import { PanelLeft } from 'lucide-react'
+import type { Task } from '@models/task.model'
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState('General')
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
 
-  const tasks = [
+  // Mock initial tasks based on the model
+  const [tasks, setTasks] = useState<Task[]>([
     {
-      id: "task-1",
+      id: "550e8400-e29b-41d4-a716-446655440000",
       title: "How I built my first website with Nuxt, Tailwind CSS and Vercel",
       description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. At velit illum provident a, ipsa maiores deleniti consectetur nobis et eaque.",
+      status: 'todo',
+      priority: 'medium',
+      due_date: new Date().toISOString()
     },
     {
-      id: "task-2",
+      id: "678e8400-e29b-41d4-a716-446655440111",
       title: "Mastering React 18: New Features and Best Practices",
       description: "Dive deep into concurrent rendering, automatic batching, and transition APIs to build smoother user experiences.",
-    },
-    {
-      id: "task-3",
-      title: "The Future of Frontend Engineering",
-      description: "Exploring the evolution of web frameworks, the rise of server-side logic, and what's next for the ecosystem.",
+      status: 'in-progress',
+      priority: 'high',
+      due_date: new Date().toISOString()
     }
-  ]
+  ])
+
+  const handleUpdateTask = (id: string, updatedData: any) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t))
+  }
+
+  const handleDeleteTask = (id: string) => {
+    setTasks(prev => prev.filter(t => t.id !== id))
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -54,20 +64,15 @@ export function HomePage() {
           <div className="max-w-6xl mx-auto w-full px-4 space-y-8 pb-12">
             {/* New Task Input Form */}
             <section>
-              <TaskForm />
+              <TaskForm onSave={(data) => console.log('Create task:', data)} />
             </section>
 
-            {/* Tasks List */}
-            <section className="flex flex-col gap-3">
-              {tasks.map((task) => (
-                <StatCard 
-                  key={task.id}
-                  id={task.id}
-                  title={task.title}
-                  description={task.description}
-                />
-              ))}
-            </section>
+            {/* Tasks List Component */}
+            <TaskList 
+              tasks={tasks} 
+              onUpdateTask={handleUpdateTask}
+              onDeleteTask={handleDeleteTask}
+            />
           </div>
         </main>
       </div>
