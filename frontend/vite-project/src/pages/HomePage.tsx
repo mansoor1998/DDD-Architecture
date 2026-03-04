@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks'
 import { Sidebar } from '@components/Sidebar'
 import { StatCard } from '@components/StatCard'
-import { DatePicker } from '@components/DatePicker'
+import { TaskForm } from '@components/TaskForm'
 import { PanelLeft } from 'lucide-react'
 
 export function HomePage() {
@@ -35,10 +35,7 @@ export function HomePage() {
         isOpen={isSidebarOpen}
       />
 
-      {/* Main UI Layer */}
       <div className="flex-1 flex flex-col min-w-0 relative">
-        
-        {/* Fixed Toggle Bar - Independent of main content padding */}
         <div className="h-14 flex items-center px-4 shrink-0">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -49,30 +46,28 @@ export function HomePage() {
           </button>
         </div>
 
-        {/* Scrollable Content Area */}
         <main className="flex-1 overflow-y-auto px-8 pb-8">
-          
-          {/* Centered Header Section */}
-          <header className="max-w-6xl mx-auto w-full flex justify-between items-end mb-8 px-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{activeTab} Tasks</h1>
-            </div>
-            <DatePicker 
-              selectedDate={selectedDate} 
-              onChange={(date) => setSelectedDate(date)} 
-            />
+          <header className="max-w-6xl mx-auto w-full mb-8 px-4">
+            <h1 className="text-2xl font-bold text-gray-900">{activeTab} Tasks</h1>
           </header>
 
-          {/* Centered Tasks List Section */}
-          <div className="flex flex-col gap-3 w-full px-4 max-w-6xl mx-auto pb-12">
-            {tasks.map((task) => (
-              <StatCard 
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                description={task.description}
-              />
-            ))}
+          <div className="max-w-6xl mx-auto w-full px-4 space-y-8 pb-12">
+            {/* New Task Input Form */}
+            <section>
+              <TaskForm />
+            </section>
+
+            {/* Tasks List */}
+            <section className="flex flex-col gap-3">
+              {tasks.map((task) => (
+                <StatCard 
+                  key={task.id}
+                  id={task.id}
+                  title={task.title}
+                  description={task.description}
+                />
+              ))}
+            </section>
           </div>
         </main>
       </div>
