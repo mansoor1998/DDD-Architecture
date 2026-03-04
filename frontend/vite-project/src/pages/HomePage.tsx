@@ -42,7 +42,7 @@ export function HomePage() {
         <div className="h-14 flex items-center px-4 shrink-0">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all cursor-pointer"
             title={isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
           >
             <PanelLeft className={`size-5 transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
