@@ -4,9 +4,10 @@ import preactLogo from '@/assets/preact.svg'
 type SidebarProps = {
   value: string
   onChange: (name: string) => void
+  isOpen: boolean
 }
 
-export function Sidebar({ value, onChange }: SidebarProps) {
+export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
   const menuItems = [
     { name: 'General', icon: LayoutGrid },
     { name: 'Today', icon: Calendar },
@@ -15,8 +16,8 @@ export function Sidebar({ value, onChange }: SidebarProps) {
   ]
 
   return (
-    <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white w-64 shrink-0">
-      <div className="px-4 py-6">
+    <div className={`flex h-screen flex-col justify-between border-e border-gray-100 bg-white shrink-0 transition-all duration-300 ease-in-out ${isOpen ? 'w-64 opacity-100' : 'w-0 opacity-0 overflow-hidden border-none'}`}>
+      <div className="px-4 py-6 min-w-[16rem]">
         <div className="flex items-center gap-2 px-2">
           <img src={preactLogo} className="size-8" alt="Preact logo" />
           <span className="text-lg font-bold text-gray-900 tracking-tight">
