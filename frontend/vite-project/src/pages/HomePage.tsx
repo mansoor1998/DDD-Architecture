@@ -67,10 +67,9 @@ export function HomePage() {
       due_date: data.due_date?.toISOString() || null
     }
     createTask.mutate(dto, {
-      onSuccess: () => {
-        setIsAddingTask(false)
-      }
-    })
+      onSuccess: () => {}
+    });
+    setIsAddingTask(false);
   }
 
   const handleOpenAddTask = () => {
