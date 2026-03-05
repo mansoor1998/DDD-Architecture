@@ -9,6 +9,7 @@ export type TaskPriority = z.infer<typeof TaskPrioritySchema>
 export const TaskSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
+  clientId: z.string().optional(), // Added for stable animations
   title: z.string().min(1, 'Title is required'),
   description: z.string().nullable().optional(),
   status: TaskStatusSchema.default('pending'),

@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@components/LoadingSpinner'
 import { PanelLeft, Plus } from 'lucide-react'
 import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '@hooks/useTasks'
 import type { Task, CreateTaskDto, UpdateTaskDto } from '@models/task.model'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState('General')
@@ -28,8 +29,6 @@ export function HomePage() {
       if (a.status !== 'completed' && b.status === 'completed') return -1
       return 0
     });
-
-    console.log(sortedTasks);
 
     return sortedTasks.filter(task => {
       if (activeTab === 'All') return true
@@ -132,14 +131,21 @@ export function HomePage() {
                 )}
 
                 {/* New Task Input Form */}
-                {isAddingTask && (
-                  <section className="pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
-                    <TaskForm 
-                      onSave={handleCreateTask} 
-                      onCancel={() => setIsAddingTask(false)}
-                    />
-                  </section>
-                )}
+                <AnimatePresence>
+                  {isAddingTask && (
+                    <motion.section 
+                      initial={{ opacity: 0, height: 0, y: -20 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -20 }}
+                      className="pt-2 overflow-hidden"
+                    >
+                      <TaskForm 
+                        onSave={handleCreateTask} 
+                        onCancel={() => setIsAddingTask(false)}
+                      />
+                    </motion.section>
+                  )}
+                </AnimatePresence>
               </>
             )}
           </div>

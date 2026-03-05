@@ -8,17 +8,42 @@ export const TASK_KEYS = {
   detail: (id: string) => ['tasks', id] as const,
 }
 
+// TODO: The implementation using clientIdMap to handle the unique keys is not the best approach 
+// might need to think of something else, but this needs to be changed
+
+// Session-stable mapping of server IDs to client-generated IDs
+const clientIdMap = new Map<string, string>()
+
+const getOrCreateClientId = (serverId: string) => {
+  if (!clientIdMap.has(serverId)) {
+    clientIdMap.set(serverId, crypto.randomUUID())
+  }
+  return clientIdMap.get(serverId)!
+}
+
 export function useTasks() {
   return useQuery({
     queryKey: TASK_KEYS.all,
-    queryFn:  taskService.getAll,
+    queryFn: async () => {
+      const tasks = await taskService.getAll()
+      return tasks.map(t => ({ 
+        ...t, 
+        clientId: getOrCreateClientId(t.id) 
+      }))
+    },
   })
 }
 
 export function useTask(id: string) {
   return useQuery({
     queryKey: TASK_KEYS.detail(id),
-    queryFn:  () => taskService.getById(id),
+    queryFn: async () => {
+      const task = await taskService.getById(id)
+      return { 
+        ...task, 
+        clientId: getOrCreateClientId(task.id) 
+      }
+    },
     enabled:  !!id,
   })
 }
@@ -39,6 +64,7 @@ export function useCreateTask() {
           { 
             ...newTask, 
             id: tempId, 
+            clientId: tempId, // Our own assigned ID
             user_id: '', 
             status: newTask.status || 'pending',
             priority: newTask.priority || 'medium',
@@ -50,9 +76,17 @@ export function useCreateTask() {
       return { previousTasks, tempId }
     },
     onSuccess: (createdTask, _variables, context) => {
-      // Replace the optimistic placeholder with the actual server response
+      // Register the link between the real server ID and our client ID
+      if (context?.tempId) {
+        clientIdMap.set(createdTask.id, context.tempId)
+      }
+
       queryClient.setQueryData<Task[]>(TASK_KEYS.all, (old) => 
-        old?.map(task => task.id === context?.tempId ? createdTask : task)
+        old?.map(task => 
+          task.clientId === context?.tempId 
+            ? { ...createdTask, clientId: context.tempId } 
+            : task
+        )
       )
     },
     onError: (err: any, _newTask, context) => {
@@ -63,7 +97,7 @@ export function useCreateTask() {
       toast.error(err.message || 'Failed to create task')
     },
     // onSettled: () => {
-    //   // queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
+    //   queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
     // },
   })
 }
@@ -97,11 +131,17 @@ export function useUpdateTask() {
       return { previousTasks, previousTask }
     },
     onSuccess: (updatedTask, { id }) => {
-      // Update with exact server response (includes updated_at, etc.)
       queryClient.setQueryData<Task[]>(TASK_KEYS.all, (old) => 
-        old?.map(task => task.id === id ? updatedTask : task)
+        old?.map(task => 
+          task.id === id 
+            ? { ...updatedTask, clientId: task.clientId } 
+            : task
+        )
       )
-      queryClient.setQueryData(TASK_KEYS.detail(id), updatedTask)
+      queryClient.setQueryData(TASK_KEYS.detail(id), { 
+        ...updatedTask, 
+        clientId: clientIdMap.get(id) || id 
+      })
     },
     onError: (err: any, { id }, context) => {
       if (context?.previousTasks) {
@@ -114,8 +154,8 @@ export function useUpdateTask() {
       toast.error(err.message || 'Failed to update task')
     },
     // onSettled: (data, error, { id }) => {
-    //   // queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
-    //   // queryClient.invalidateQueries({ queryKey: TASK_KEYS.detail(id) })
+    //   queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
+    //   queryClient.invalidateQueries({ queryKey: TASK_KEYS.detail(id) })
     // },
   })
 }
@@ -137,6 +177,9 @@ export function useDeleteTask() {
       }
 
       return { previousTasks }
+    },
+    onSuccess: (_, id) => {
+      clientIdMap.delete(id)
     },
     onError: (err: any, _id, context) => {
       if (context?.previousTasks) {
