@@ -131,7 +131,7 @@ export function HomePage() {
                 )}
 
                 {/* New Task Input Form */}
-                <AnimatePresence>
+                {/* <AnimatePresence>
                   {isAddingTask && (
                     <motion.section 
                       initial={{ opacity: 0, height: 0, y: -20 }}
@@ -145,7 +145,15 @@ export function HomePage() {
                       />
                     </motion.section>
                   )}
-                </AnimatePresence>
+                </AnimatePresence> */}
+                {
+                  isAddingTask && (
+                    <TaskForm 
+                      onSave={handleCreateTask} 
+                      onCancel={() => setIsAddingTask(false)}
+                    />
+                  )
+                }
               </>
             )}
           </div>
