@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { authService } from '@services/auth.service'
 import { useAuthStore } from '@store/auth.store'
 import type { RegisterPayload, LoginPayload } from '@models/auth.model'
+import { toast } from 'react-toastify'
 
 export function useRegister() {
   const { setAuth } = useAuthStore()
@@ -10,7 +11,12 @@ export function useRegister() {
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
     onSuccess: (data) => {
       setAuth(data)
+      // toast.success('Registration successful! Please verify your email.')
     },
+    onError: (error: any) => {
+      error.handled = true
+      toast.error(error.message || 'Registration failed')
+    }
   })
 }
 
@@ -33,6 +39,9 @@ export function useLogin() {
     onSuccess: (data) => {
       setAuth(data)
     },
+    onError: (error: any) => {
+      toast.error(error.message || 'Login failed')
+    }
   })
 }
 
@@ -43,6 +52,10 @@ export function useVerifyEmail() {
     mutationFn: (token: string) => authService.verifyEmail(token),
     onSuccess: () => {
       updateIsActive(true)
+      // toast.success('Email verified successfully!')
     },
+    onError: (error: any) => {
+      toast.error(error.message || 'Email verification failed')
+    }
   })
 }

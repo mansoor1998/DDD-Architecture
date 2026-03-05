@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { taskService } from '@services/task.service'
 import type { CreateTaskDto, UpdateTaskDto } from '@models/task.model'
+import { toast } from 'react-toastify'
 
 export const TASK_KEYS = {
   all:    ['tasks']           as const,
@@ -28,7 +29,12 @@ export function useCreateTask() {
     mutationFn: (dto: CreateTaskDto) => taskService.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
+      // toast.success('Task created successfully')
     },
+    onError: (error: any) => {
+      error.handled = true
+      toast.error(error.message || 'Failed to create task')
+    }
   })
 }
 
@@ -41,6 +47,10 @@ export function useUpdateTask() {
       queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
       queryClient.invalidateQueries({ queryKey: TASK_KEYS.detail(id) })
     },
+    onError: (error: any) => {
+      error.handled = true
+      toast.error(error.message || 'Failed to update task')
+    }
   })
 }
 
@@ -50,6 +60,11 @@ export function useDeleteTask() {
     mutationFn: (id: string) => taskService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TASK_KEYS.all })
+      // toast.success('Task deleted successfully')
     },
+    onError: (error: any) => {
+      error.handled = true
+      toast.error(error.message || 'Failed to delete task')
+    }
   })
 }

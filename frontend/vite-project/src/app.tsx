@@ -1,12 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query'
 import { HomePage } from '@pages/HomePage'
 import { LoginPage } from '@pages/LoginPage'
 import { RegisterPage } from '@pages/RegisterPage'
 import { VerifyPage } from '@pages/VerifyPage'
 import { useAuthStore } from '@store/auth.store'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error: any) => {
+      console.error('Query error:', error)
+      // toast.error(error.message || 'An error occurred while fetching data')
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: 1,
@@ -90,6 +98,18 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </QueryClientProvider>
   )
 }

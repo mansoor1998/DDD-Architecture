@@ -21,12 +21,6 @@ export function RegisterPage() {
           <h2 className="text-3xl font-extrabold text-gray-900">Create Account</h2>
           <p className="mt-2 text-sm text-gray-600">Join us to manage your tasks effectively.</p>
         </div>
-        
-        {error && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200">
-            {error.message}
-          </div>
-        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">

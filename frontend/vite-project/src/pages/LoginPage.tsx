@@ -29,12 +29,6 @@ export function LoginPage() {
           <p className="mt-2 text-sm text-gray-600">Welcome back! Please enter your details.</p>
         </div>
 
-        {error && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200">
-            {error.message}
-          </div>
-        )}
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
