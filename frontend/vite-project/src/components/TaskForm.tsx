@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'preact/hooks'
 import { DatePicker } from '@components/DatePicker'
 import { Plus, Flag, ChevronDown, AlertCircle, Info, X } from 'lucide-react'
-
-type Priority = 'low' | 'medium' | 'high'
+import type { TaskPriority, TaskStatus } from '@models/task.model'
 
 type TaskFormProps = {
   initialData?: {
     title: string
     description?: string
-    priority: Priority
+    priority: TaskPriority
+    status: TaskStatus
     due_date?: Date
   }
   onSave?: (data: any) => void
@@ -18,8 +18,9 @@ type TaskFormProps = {
 export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
   const [taskName, setTaskName] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
-  const [date, setDate] = useState<Date | undefined>(initialData?.due_date || new Date())
-  const [priority, setPriority] = useState<Priority>(initialData?.priority || 'medium')
+  const [date, setDate] = useState<Date | undefined>(initialData?.due_date)
+  const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium')
+  const [status, setStatus] = useState<TaskStatus>(initialData?.status || 'pending')
   const [isPriorityOpen, setIsPriorityOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -38,10 +39,10 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
   const handleSubmit = (e: Event) => {
     e.preventDefault()
     if (!taskName.trim()) return
-    onSave?.({ title: taskName, description, priority, due_date: date })
+    onSave?.({ title: taskName, description, priority, status, due_date: date })
   }
 
-  const priorityOptions: { label: Priority; display: string; icon: any; color: string; bg: string }[] = [
+  const priorityOptions: { label: TaskPriority; display: string; icon: any; color: string; bg: string }[] = [
     { label: 'high', display: 'High', icon: AlertCircle, color: 'text-red-600', bg: 'hover:bg-red-50' },
     { label: 'medium', display: 'Medium', icon: Flag, color: 'text-orange-500', bg: 'hover:bg-orange-50' },
     { label: 'low', display: 'Low', icon: Info, color: 'text-blue-500', bg: 'hover:bg-blue-50' },
@@ -64,7 +65,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
             if (e.key === 'Enter') {
               e.preventDefault()
               if (taskName.trim()) {
-                onSave?.({ title: taskName, description, priority, due_date: date })
+                onSave?.({ title: taskName, description, priority, status, due_date: date })
               }
             }
           }}
@@ -80,7 +81,7 @@ export function TaskForm({ initialData, onSave, onCancel }: TaskFormProps) {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
               if (taskName.trim()) {
-                onSave?.({ title: taskName, description, priority, due_date: date })
+                onSave?.({ title: taskName, description, priority, status, due_date: date })
               }
             }
           }}

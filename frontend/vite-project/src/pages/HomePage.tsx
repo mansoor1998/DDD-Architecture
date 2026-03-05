@@ -1,73 +1,70 @@
-import { useState } from 'preact/hooks'
+import { useState, useMemo } from 'preact/hooks'
 import { Sidebar } from '@components/Sidebar'
 import { TaskForm } from '@components/TaskForm'
 import { TaskList } from '@components/TaskList'
+import { LoadingSpinner } from '@components/LoadingSpinner'
 import { PanelLeft, Plus } from 'lucide-react'
-import type { Task } from '@models/task.model'
+import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '@hooks/useTasks'
+import type { Task, CreateTaskDto, UpdateTaskDto } from '@models/task.model'
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState('General')
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isAddingTask, setIsAddingTask] = useState(false)
 
-  // Mock initial tasks based on the model
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "550e8400-e29b-41d4-a716-446655440000",
-      title: "How I built my first website with Nuxt, Tailwind CSS and Vercel",
-      description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. At velit illum provident a, ipsa maiores deleniti consectetur nobis et eaque.",
-      status: 'todo',
-      priority: 'medium',
-      due_date: new Date().toISOString()
-    },
-    {
-      id: "678e8400-e29b-41d4-a716-446655440111",
-      title: "Mastering React 18: New Features and Best Practices",
-      description: "Dive deep into concurrent rendering, automatic batching, and transition APIs to build smoother user experiences.",
-      status: 'in-progress',
-      priority: 'high',
-      due_date: new Date().toISOString()
-    },
-    {
-      id: "789e8400-e29b-41d4-a716-446655440222",
-      title: "Refactor Authentication Service",
-      status: 'todo',
-      priority: 'high',
-      due_date: new Date(Date.now() + 86400000 * 2).toISOString()
-    },
-    {
-      id: "890e8400-e29b-41d4-a716-446655440333",
-      title: "Weekly Design Sync",
-      status: 'todo',
-      priority: 'low',
-      due_date: new Date(Date.now() + 86400000 * 5).toISOString()
-    }
-  ])
+  const { data: tasks = [], isLoading } = useTasks()
+  const createTask = useCreateTask()
+  const updateTask = useUpdateTask()
+  const deleteTask = useDeleteTask()
 
-  const handleUpdateTask = (id: string, updatedData: any) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t))
+  const filteredTasks = useMemo(() => {
+    // const now = new Date()
+    // const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+    // const oneDay = 24 * 60 * 60 * 1000
+    // const oneWeek = 7 * oneDay
+
+    // return tasks.filter(task => {
+    //   if (activeTab === 'All') return true
+    //   if (activeTab === 'General') return task.status !== 'completed'
+      
+    //   if (!task.due_date) return false
+    //   const dueDate = new Date(task.due_date).getTime()
+      
+    //   if (activeTab === 'Today') {
+    //     return dueDate >= today && dueDate < today + oneDay
+    //   }
+    //   if (activeTab === 'Weekly') {
+    //     return dueDate >= today && dueDate < today + oneWeek
+    //   }
+    //   return true
+    // })
+
+    return tasks
+  }, [tasks, activeTab])
+
+  const handleUpdateTask = (id: string, updatedData: UpdateTaskDto) => {
+    updateTask.mutate({ id, dto: updatedData })
   }
 
   const handleDeleteTask = (id: string) => {
-    setTasks(prev => prev.filter(t => t.id !== id))
+    deleteTask.mutate(id)
   }
 
   const handleCreateTask = (data: any) => {
-    const newTask: Task = {
-      id: crypto.randomUUID(),
+    const dto: CreateTaskDto = {
       ...data,
-      status: 'todo',
+      status: 'pending',
       due_date: data.due_date?.toISOString() || null
     }
-    setTasks(prev => [...prev, newTask])
-    setIsAddingTask(false)
+    createTask.mutate(dto, {
+      onSuccess: () => {
+        setIsAddingTask(false)
+      }
+    })
   }
 
   const handleOpenAddTask = () => {
     setIsAddingTask(true)
-    // The editingTaskId state is internal to TaskList, 
-    // we'll need to reset it via a ref or key if we wanted full control,
-    // but the task list will notify us if it starts editing.
   }
 
   return (
@@ -95,38 +92,44 @@ export function HomePage() {
           </header>
 
           <div className="max-w-6xl mx-auto w-full px-4 space-y-6 pb-12">
-            {/* Tasks List Component */}
-            <TaskList 
-              tasks={tasks} 
-              onUpdateTask={handleUpdateTask}
-              onDeleteTask={handleDeleteTask}
-              onEditStart={() => setIsAddingTask(false)}
-            />
-
-            {/* Add Task Button */}
-            <div className="border-t border-gray-200 w-full" />
-
-            {/* Divider */}
-            {!isAddingTask && (
-              <div className="pt-2 flex flex-col items-start gap-4">
-                <button 
-                  onClick={handleOpenAddTask}
-                  className="group inline-flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-300 transition-all cursor-pointer active:scale-95"
-                >
-                  <Plus className="size-4 text-gray-400 group-hover:text-indigo-600" />
-                  <span>Add Task</span>
-                </button>
-              </div>
-            )}
-
-            {/* New Task Input Form */}
-            {isAddingTask && (
-              <section className="pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
-                <TaskForm 
-                  onSave={handleCreateTask} 
-                  onCancel={() => setIsAddingTask(false)}
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                {/* Tasks List Component */}
+                <TaskList 
+                  tasks={filteredTasks} 
+                  onUpdateTask={handleUpdateTask}
+                  onDeleteTask={handleDeleteTask}
+                  onEditStart={() => setIsAddingTask(false)}
                 />
-              </section>
+
+                {/* Add Task Button */}
+                <div className="border-t border-gray-200 w-full" />
+
+                {/* Divider */}
+                {!isAddingTask && (
+                  <div className="pt-2 flex flex-col items-start gap-4">
+                    <button 
+                      onClick={handleOpenAddTask}
+                      className="group inline-flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-300 transition-all cursor-pointer active:scale-95"
+                    >
+                      <Plus className="size-4 text-gray-400 group-hover:text-indigo-600" />
+                      <span>Add Task</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* New Task Input Form */}
+                {isAddingTask && (
+                  <section className="pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <TaskForm 
+                      onSave={handleCreateTask} 
+                      onCancel={() => setIsAddingTask(false)}
+                    />
+                  </section>
+                )}
+              </>
             )}
           </div>
         </main>
