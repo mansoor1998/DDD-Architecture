@@ -18,33 +18,43 @@ export function HomePage() {
   const deleteTask = useDeleteTask()
 
   const filteredTasks = useMemo(() => {
-    // const now = new Date()
-    // const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-    // const oneDay = 24 * 60 * 60 * 1000
-    // const oneWeek = 7 * oneDay
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+    const oneDay = 24 * 60 * 60 * 1000
+    const oneWeek = 7 * oneDay
 
-    // return tasks.filter(task => {
-    //   if (activeTab === 'All') return true
-    //   if (activeTab === 'General') return task.status !== 'completed'
-    //   if (activeTab === 'Completed') return task.status === 'completed'
+    const sortedTasks = [...tasks].sort((a, b) => {
+      if (a.status === 'completed' && b.status !== 'completed') return 1
+      if (a.status !== 'completed' && b.status === 'completed') return -1
+      return 0
+    });
 
-    //   if (!task.due_date) return false
-    //   const dueDate = new Date(task.due_date).getTime()
+    console.log(sortedTasks);
+
+    return sortedTasks.filter(task => {
+      if (activeTab === 'All') return true
+      if (activeTab === 'General') return task.status !== 'completed'
+      if (activeTab === 'Completed') return task.status === 'completed'
+
+      if (!task.due_date) return false
+      const dueDate = new Date(task.due_date).getTime()
       
-    //   if (activeTab === 'Today') {
-    //     return dueDate >= today && dueDate < today + oneDay
-    //   }
-    //   if (activeTab === 'Weekly') {
-    //     return dueDate >= today && dueDate < today + oneWeek
-    //   }
-    //   return true
-    // })
-
-    return tasks
+      if (activeTab === 'Today') {
+        return dueDate >= today && dueDate < today + oneDay
+      }
+      if (activeTab === 'Weekly') {
+        return dueDate >= today && dueDate < today + oneWeek
+      }
+      return true
+    })
   }, [tasks, activeTab])
 
-  const handleUpdateTask = (id: string, updatedData: UpdateTaskDto) => {
-    updateTask.mutate({ id, dto: updatedData })
+  const handleUpdateTask = (id: string, updatedData: any) => {
+    const dto: UpdateTaskDto = {
+      ...updatedData,
+      due_date: updatedData.due_date instanceof Date ? updatedData.due_date.toISOString() : updatedData.due_date
+    }
+    updateTask.mutate({ id, dto })
   }
 
   const handleDeleteTask = (id: string) => {
