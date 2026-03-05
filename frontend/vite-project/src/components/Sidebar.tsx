@@ -74,9 +74,8 @@ export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
             className="size-10 rounded-full object-cover"
           />
 
-          <div>
-            <p className="text-xs">
-              <strong className="block font-medium capitalize">{userName}</strong>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs truncate">
               <span className="text-gray-400"> {email} </span>
             </p>
           </div>
