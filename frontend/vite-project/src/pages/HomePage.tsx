@@ -26,7 +26,8 @@ export function HomePage() {
     // return tasks.filter(task => {
     //   if (activeTab === 'All') return true
     //   if (activeTab === 'General') return task.status !== 'completed'
-      
+    //   if (activeTab === 'Completed') return task.status === 'completed'
+
     //   if (!task.due_date) return false
     //   const dueDate = new Date(task.due_date).getTime()
       

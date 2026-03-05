@@ -1,4 +1,4 @@
-import { LayoutGrid, Calendar, CalendarDays, ListTodo, LogOut } from 'lucide-react'
+import { LayoutGrid, Calendar, CalendarDays, ListTodo, LogOut, CheckCircle } from 'lucide-react'
 import preactLogo from '@/assets/preact.svg'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@store/auth.store'
@@ -24,6 +24,7 @@ export function Sidebar({ value, onChange, isOpen }: SidebarProps) {
     { name: 'General', icon: LayoutGrid },
     { name: 'Today', icon: Calendar },
     { name: 'Weekly', icon: CalendarDays },
+    { name: 'Completed', icon: CheckCircle },
     { name: 'All', icon: ListTodo },
   ]
 
