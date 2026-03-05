@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from app.core import settings, create_access_token
 from app.domain.services import UserService
-from app.api.dependencies import get_user_service
+from app.api.dependencies import get_current_user_inactive, get_user_service
 from app.schemas import User as UserSchema, UserCreate, Token, UserWithToken
 from app.domain import (
     UserAlreadyExistsError, 
@@ -12,6 +12,7 @@ from app.domain import (
     InactiveUserError, 
     InvalidTokenError
 )
+from app.domain.models import User as DomainUser
 
 router = APIRouter()
 
@@ -36,6 +37,25 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+
+@router.post("/resend-verification")
+async def resend_verification_email(
+    user_service: UserService = Depends(get_user_service),
+    current_user: DomainUser = Depends(get_current_user_inactive),
+):
+    if current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already verified",
+        )
+    
+    if await user_service.resend_verification_email(current_user):
+        return {"message": "Verification email resent"}
+    
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Failed to resend verification email",
+    )
 
 @router.get("/verify-email")
 async def verify_email(

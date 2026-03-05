@@ -30,10 +30,29 @@ def get_user_service(
 def get_task_service(task_repo: ITaskRepository = Depends(get_task_repository)) -> TaskService:
     return TaskService(task_repo)
 
+
+async def get_current_user_inactive(
+    token: str = Depends(oauth2_scheme),
+    user_service: UserService = Depends(get_user_service),
+) -> User:
+    return await is_token_invalid(token, user_service)
+
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     user_service: UserService = Depends(get_user_service),
 ) -> User:
+    user = await is_token_invalid(token, user_service)
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account is inactive. Please verify your email.",
+        )
+        
+    return user
+
+
+async def is_token_invalid(token: str, user_service: UserService) -> User:
     token_data = decode_access_token(token)
     if token_data.sub is None:
         raise HTTPException(
@@ -48,10 +67,4 @@ async def get_current_user(
             detail="User not found",
         )
     
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User account is inactive. Please verify your email.",
-        )
-        
     return user

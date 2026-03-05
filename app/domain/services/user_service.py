@@ -22,7 +22,6 @@ class UserService:
         
         hashed_password = get_password_hash(password)
         
-        # Create domain user object
         new_user = DomainUser(
             email=email,
             password_hash=hashed_password,
@@ -31,7 +30,6 @@ class UserService:
 
         user = await self.user_repository.create(new_user)
         
-        # Send verification email
         await self.email_sender.send_verification_email(user.email, user.verification_token)
         
         return user
@@ -58,4 +56,11 @@ class UserService:
         user.verification_token = None
         user.updated_at = datetime.datetime.utcnow()
         await self.user_repository.update(user)
+        return True
+    
+    async def resend_verification_email(self, user: DomainUser) -> bool:
+        if user.is_active:
+            raise ValueError("Email is already verified")
+        
+        await self.email_sender.send_verification_email(user.email, user.verification_token)
         return True
