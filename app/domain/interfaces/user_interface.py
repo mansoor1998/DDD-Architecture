@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from app.domain import User
+from app.domain.models import User
 
 
 class IUserRepository(ABC):

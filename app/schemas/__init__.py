@@ -1,6 +1,6 @@
-from .user import User, UserCreate, UserWithToken
-from .task import Task, TaskCreate, TaskUpdate
-from .token import Token, TokenPayload
+from app.schemas.user import User, UserCreate, UserWithToken
+from app.schemas.task import Task, TaskCreate, TaskUpdate
+from app.schemas.token import Token, TokenPayload
 
 __all__ = [
     "User",

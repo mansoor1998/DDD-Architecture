@@ -5,8 +5,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
 
-from app.core import settings
-from app.schemas import TokenPayload
+from app.core.config import settings
+from app.schemas.token import TokenPayload
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
