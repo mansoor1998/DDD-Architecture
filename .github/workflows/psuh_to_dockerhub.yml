@@ -19,8 +19,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_EMAIL }}
-          password: ${{ secrets.DOCKER_HUB_USERNAME }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       # Step 3: Build the Docker image and push it to the registry
       - name: Build and Push Docker Image
@@ -30,4 +30,4 @@ jobs:
           file: ./Dockerfile.backend
           push: true
           # Replace 'my-fastapi-app' with your actual Docker Hub repository name
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/todo-app:latest
