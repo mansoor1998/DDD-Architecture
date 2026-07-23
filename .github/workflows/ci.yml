@@ -40,4 +40,4 @@ jobs:
 
       # Step 6: Run Pytest (Fails if any tests fail)
       - name: Run Tests with Pytest
-        run: pytest
+        run: python -m pytest
