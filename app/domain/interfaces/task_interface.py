@@ -4,6 +4,7 @@ from uuid import UUID
 
 from app.domain.models import Task
 
+
 class ITaskRepository(ABC):
     @abstractmethod
     async def create(self, task: Task) -> Task:

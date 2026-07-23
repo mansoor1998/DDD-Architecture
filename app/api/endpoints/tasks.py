@@ -10,6 +10,7 @@ from app.domain import TaskNotFoundError, AccessDeniedError
 
 router = APIRouter()
 
+
 @router.post("/", response_model=TaskSchema, status_code=status.HTTP_201_CREATED)
 async def create_task(
     task_in: TaskCreate,
@@ -23,9 +24,10 @@ async def create_task(
         return await task_service.create_task(task_in.model_dump(), current_user.id)
     except AccessDeniedError:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, 
-            detail="User cannot have more than 50 active tasks"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User cannot have more than 50 active tasks",
         )
+
 
 @router.get("/", response_model=List[TaskSchema])
 async def get_tasks(
@@ -36,6 +38,7 @@ async def get_tasks(
     Get all tasks for the current user.
     """
     return await task_service.get_user_tasks(current_user.id)
+
 
 @router.get("/{task_id}", response_model=TaskSchema)
 async def get_task(
@@ -51,7 +54,10 @@ async def get_task(
     except TaskNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
+
 
 @router.put("/{task_id}", response_model=TaskSchema)
 async def update_task(
@@ -64,11 +70,16 @@ async def update_task(
     Update a task.
     """
     try:
-        return await task_service.update_task(task_id, task_in.model_dump(exclude_unset=True), current_user.id)
+        return await task_service.update_task(
+            task_id, task_in.model_dump(exclude_unset=True), current_user.id
+        )
     except TaskNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
+
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
@@ -85,4 +96,6 @@ async def delete_task(
     except TaskNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )

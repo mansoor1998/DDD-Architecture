@@ -3,15 +3,18 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
 
+
 class TaskStatus(str, Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
 
+
 class TaskPriority(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
+
 
 class User:
     def __init__(
@@ -31,6 +34,7 @@ class User:
         self.verification_token = verification_token or str(uuid4())
         self.created_at = created_at or datetime.datetime.utcnow()
         self.updated_at = updated_at or datetime.datetime.utcnow()
+
 
 class Task:
     def __init__(

@@ -8,6 +8,7 @@ from app.domain.interfaces import ITaskRepository
 from app.domain import Task as DomainTask
 from app.infrastructure.persistence.models import Task as ORMTask
 
+
 class TaskRepository(ITaskRepository):
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -43,15 +44,21 @@ class TaskRepository(ITaskRepository):
         return self._to_domain(orm_task)
 
     async def get_by_id(self, task_id: UUID) -> Optional[DomainTask]:
-        result = await self.db.execute(select(ORMTask).filter(ORMTask.id == str(task_id)))
+        result = await self.db.execute(
+            select(ORMTask).filter(ORMTask.id == str(task_id))
+        )
         orm_task = result.scalars().first()
         return self._to_domain(orm_task) if orm_task else None
 
     async def get_all_by_user_id(self, user_id: UUID) -> List[DomainTask]:
-        result = await self.db.execute(select(ORMTask).filter(ORMTask.user_id == str(user_id)))
+        result = await self.db.execute(
+            select(ORMTask).filter(ORMTask.user_id == str(user_id))
+        )
         return [self._to_domain(orm_task) for orm_task in result.scalars().all()]
 
-    async def update(self, task_id: UUID, task_update_data: dict) -> Optional[DomainTask]:
+    async def update(
+        self, task_id: UUID, task_update_data: dict
+    ) -> Optional[DomainTask]:
         if not task_update_data:
             return await self.get_by_id(task_id)
 

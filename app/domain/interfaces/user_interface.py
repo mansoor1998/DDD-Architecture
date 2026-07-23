@@ -4,6 +4,7 @@ from uuid import UUID
 
 from app.domain import User
 
+
 class IUserRepository(ABC):
     @abstractmethod
     async def get_by_email(self, email: str) -> Optional[User]:

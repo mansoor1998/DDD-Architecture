@@ -5,6 +5,7 @@ from app.domain.models import User as DomainUser
 
 router = APIRouter()
 
+
 @router.get("/me", response_model=UserSchema)
 async def read_users_me(current_user: DomainUser = Depends(get_current_user)):
     """

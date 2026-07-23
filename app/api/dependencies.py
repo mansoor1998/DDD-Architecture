@@ -12,22 +12,29 @@ from app.infrastructure.email import GmailEmailSender
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login/access-token")
 
+
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> IUserRepository:
     return UserRepository(db)
+
 
 def get_task_repository(db: AsyncSession = Depends(get_db)) -> ITaskRepository:
     return TaskRepository(db)
 
+
 def get_email_sender() -> IEmailSender:
     return GmailEmailSender()
 
+
 def get_user_service(
     user_repo: IUserRepository = Depends(get_user_repository),
-    email_sender: IEmailSender = Depends(get_email_sender)
+    email_sender: IEmailSender = Depends(get_email_sender),
 ) -> UserService:
     return UserService(user_repo, email_sender)
 
-def get_task_service(task_repo: ITaskRepository = Depends(get_task_repository)) -> TaskService:
+
+def get_task_service(
+    task_repo: ITaskRepository = Depends(get_task_repository),
+) -> TaskService:
     return TaskService(task_repo)
 
 
@@ -37,18 +44,19 @@ async def get_current_user_inactive(
 ) -> User:
     return await is_token_invalid(token, user_service)
 
+
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     user_service: UserService = Depends(get_user_service),
 ) -> User:
     user = await is_token_invalid(token, user_service)
-    
+
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User account is inactive. Please verify your email.",
         )
-        
+
     return user
 
 
@@ -66,5 +74,5 @@ async def is_token_invalid(token: str, user_service: UserService) -> User:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return user

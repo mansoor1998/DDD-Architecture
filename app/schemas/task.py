@@ -5,6 +5,7 @@ from uuid import UUID
 
 from app.domain import TaskStatus, TaskPriority
 
+
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -12,8 +13,10 @@ class TaskBase(BaseModel):
     priority: TaskPriority = TaskPriority.MEDIUM
     due_date: Optional[datetime.datetime] = None
 
+
 class TaskCreate(TaskBase):
     pass
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -21,6 +24,7 @@ class TaskUpdate(BaseModel):
     status: Optional[TaskStatus] = None
     priority: Optional[TaskPriority] = None
     due_date: Optional[datetime.datetime] = None
+
 
 class Task(TaskBase):
     id: UUID
