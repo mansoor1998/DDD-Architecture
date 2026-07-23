@@ -1,0 +1,15 @@
+name: Say Hello Workflow
+
+# The trigger point: any push to the develop branch
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Print Hello to the console
+        run: echo "Hello!"
