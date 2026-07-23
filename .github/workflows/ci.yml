@@ -1,0 +1,47 @@
+name: Backend CI
+
+# This triggers the workflow when a Pull Request is opened against the 'main' branch
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Grab your code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14" # Change this to whatever version you use locally
+
+      # Step 3: Install your dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install your testing and linting tools
+          pip install black pylint pytest
+          # Install your app's actual dependencies (adjust this if you don't use requirements.txt)
+          pip install -r requirements.txt
+
+      # Step 4: Run Black (Fails if formatting is wrong)
+      - name: Check Formatting with Black
+        run: black --check .
+
+      # Step 5: Run Pylint (Fails if score is under 7.0)
+      - name: Lint with Pylint
+        run: pylint --fail-under=7.0 --recursive=y --ignore=venv,.venv .
+
+      # Step 6: Run Pytest (Fails if any tests fail)
+      - name: Run Tests with Pytest
+        run: python -m pytest
+
+      # Step 7: run docker build to ensure that there are no errors in the code
+      - name: Test Docker Build
+        run: docker build -f Dockerfile.backend -t test-backend-image .

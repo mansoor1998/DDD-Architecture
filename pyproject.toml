@@ -1,0 +1,5 @@
+[tool.pylint.master]
+# Always check subfolders
+recursive = true
+# Always ignore these folders
+ignore = ["venv", ".venv"]

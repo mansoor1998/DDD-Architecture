@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 from uuid import UUID
 
-from app.domain import Task
-from app.schemas import TaskCreate, TaskUpdate
+from app.domain.models import Task
+
 
 class ITaskRepository(ABC):
     @abstractmethod
-    async def create(self, task: TaskCreate, user_id: UUID) -> Task:
+    async def create(self, task: Task) -> Task:
         pass
 
     @abstractmethod
@@ -19,7 +19,7 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, task_id: UUID, task_update: TaskUpdate) -> Optional[Task]:
+    async def update(self, task_id: UUID, task_update_data: dict) -> Optional[Task]:
         pass
 
     @abstractmethod
