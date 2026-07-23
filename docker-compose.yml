@@ -1,0 +1,13 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env          # local dev: real values live here, gitignored, never baked into the image
+    # In staging/prod this env_file line is typically swapped out for either:
+    #   - `environment:` entries populated by your CI/CD pipeline from a secrets manager
+    #   - Docker "secrets:" / Kubernetes "Secret" objects mounted at runtime
+    restart: unless-stopped
