@@ -1,0 +1,25 @@
+- hosts: all
+  become: true
+  vars:
+    container_name: myapp
+
+  tasks:
+    - name: Log in to Docker Hub
+      community.docker.docker_login:
+        username: "{{ dockerhub_user }}"
+        password: "{{ dockerhub_pass }}"
+
+    - name: Pull latest image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Run container in background
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: unless-stopped
+        detach: true
+        ports:
+          - "8000:8000"
