@@ -14,6 +14,8 @@ jobs:
           ansible-galaxy collection install community.docker
 
       - name: Run playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
           ansible-playbook -i "${{ secrets.VPS_IP }}," \
           -u root \
