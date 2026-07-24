@@ -30,3 +30,7 @@ async def startup():
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Todo API"}
+
+@app.get("/test")
+def test_func():
+    return { "message": "another test function right here" }
