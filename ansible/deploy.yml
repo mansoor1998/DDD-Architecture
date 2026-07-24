@@ -4,10 +4,15 @@
     container_name: myapp
 
   tasks:
+    - name: Check if Docker is installed
+      ansible.builtin.command: which docker
+      register: docker_check
+      ignore_errors: true
+      changed_when: false
+
     - name: Install Docker
       ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
-      args:
-        creates: /usr/bin/docker
+      when: docker_check.rc != 0
 
     - name: Ensure Docker is running
       ansible.builtin.systemd:
@@ -15,10 +20,48 @@
         state: started
         enabled: true
 
+    - name: Check if Python3 is installed
+      ansible.builtin.command: which python3
+      register: python_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Python3
+      ansible.builtin.apt:
+        name: python3
+        state: present
+        update_cache: true
+      when: python_check.rc != 0
+
+    - name: Check if pip3 is installed
+      ansible.builtin.command: which pip3
+      register: pip_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install pip3
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+      when: pip_check.rc != 0
+
     - name: Install Docker Python SDK
       ansible.builtin.pip:
         name: docker
-        
+        executable: pip3
+        extra_args: --break-system-packages
+
+    - name: Check if container is running
+      community.docker.docker_container_info:
+        name: "{{ container_name }}"
+      register: container_info
+
+    - name: Stop and remove existing container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+      when: container_info.exists
+
     - name: Log in to Docker Hub
       community.docker.docker_login:
         username: "{{ dockerhub_user }}"
@@ -37,4 +80,4 @@
         restart_policy: unless-stopped
         detach: true
         ports:
-          - "8000:8000"
+          - "80:8000"
