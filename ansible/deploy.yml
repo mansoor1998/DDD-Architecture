@@ -71,6 +71,11 @@
       community.docker.docker_image:
         name: "{{ docker_image }}"
         source: pull
+        force_source: true
+
+    - name: Remove dangling images
+      ansible.builtin.command: docker image prune -f
+      changed_when: false
 
     - name: Run container in background
       community.docker.docker_container:
