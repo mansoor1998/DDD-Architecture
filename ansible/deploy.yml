@@ -5,9 +5,9 @@
 
   tasks:
     - name: Install Docker
-        ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
-        args:
-          creates: /usr/bin/docker
+      ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+      args:
+        creates: /usr/bin/docker
 
     - name: Ensure Docker is running
       ansible.builtin.systemd:
