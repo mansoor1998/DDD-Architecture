@@ -4,6 +4,21 @@
     container_name: myapp
 
   tasks:
+    - name: Install Docker
+        ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+        args:
+          creates: /usr/bin/docker
+
+    - name: Ensure Docker is running
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Install Docker Python SDK
+      ansible.builtin.pip:
+        name: docker
+        
     - name: Log in to Docker Hub
       community.docker.docker_login:
         username: "{{ dockerhub_user }}"
